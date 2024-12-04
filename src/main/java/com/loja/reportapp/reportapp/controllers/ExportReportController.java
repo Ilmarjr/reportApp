@@ -6,7 +6,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-
 import java.io.ByteArrayOutputStream;
 
 @RestController
@@ -17,9 +16,9 @@ public class ExportReportController {
     private ExportPDF exportPDF;
 
     @GetMapping(produces = MediaType.APPLICATION_PDF_VALUE)
-    public @ResponseBody byte[] exportReport(){
+    public @ResponseBody byte[] exportReport(@RequestParam(value = "limite",defaultValue = "100") int limite){
         try{
-            ByteArrayOutputStream pdfByteStream = exportPDF.generatePDF();
+            ByteArrayOutputStream pdfByteStream = exportPDF.generatePDF(limite);
             return pdfByteStream.toByteArray();
         }catch (Exception ex){
             ex.printStackTrace();

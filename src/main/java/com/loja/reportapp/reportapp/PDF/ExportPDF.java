@@ -24,7 +24,7 @@ public class ExportPDF {
     private ReportController reportController;
     private final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MMM dd, yyyy, HH:mm:ss (z)", Locale.ENGLISH);
 
-    public ByteArrayOutputStream generatePDF() {
+    public ByteArrayOutputStream generatePDF(int limite) {
         Document document = new Document();
         simpleDateFormat.setTimeZone(TimeZone.getTimeZone("GMT-5"));
         Date currentDate = new Date();
@@ -50,6 +50,7 @@ public class ExportPDF {
             phrase.add(new Chunk(simpleDateFormat.format(currentDate).replace(":00", ""), new Font(Font.FontFamily.UNDEFINED, 10, Font.NORMAL)));
             document.add(phrase);
             document.add(new Paragraph("\n"));
+
             //Top Sold Table
             document.add(new Phrase("Produtos Mais Vendidos",
                     new Font(Font.FontFamily.UNDEFINED, 16, Font.BOLD)));
@@ -63,7 +64,7 @@ public class ExportPDF {
             document.add(new Phrase("Produtos Com baixo Estoque",
                     new Font(Font.FontFamily.UNDEFINED, 16, Font.BOLD)));
             document.add(new Paragraph(" "));
-            PdfPTable productLowStorageTable = createProductLowStorageTable();
+            PdfPTable productLowStorageTable = createProductLowStorageTable(limite);
             if (productLowStorageTable != null)
                 document.add(productLowStorageTable);
             document.add(new Paragraph(" "));
@@ -137,14 +138,14 @@ public class ExportPDF {
             return null;
         }
     }
-    private PdfPTable createProductLowStorageTable() throws DocumentException {
+    private PdfPTable createProductLowStorageTable(int limite) throws DocumentException {
 
         Font topSearchFont = new Font(Font.FontFamily.UNDEFINED, 10);
         // Defining Headers
         String[] topSoldHeaders = new String[]{"", "Nome do Produto", "Estoque"};
         int[] topSoldHeadersWidths = new int[]{30, 200, 200};
         // Getting Data
-        var response = reportController.getProdutosBaixoEstoque(100);
+        var response = reportController.getProdutosBaixoEstoque(limite);
         List<ProdutoBaixoEstoqueDTO> data = Objects.requireNonNull(response.getBody());
 
         return populateProductsLowStorageTable(generateTable(topSoldHeaders, topSoldHeadersWidths, topSearchFont), data);
